@@ -44,14 +44,15 @@ def findMatch(userImage,Encodings,classNames):
                         cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
             
           
-            
+            id=str(uuid.uuid4())
             cv2.imwrite(
-                f'{settings.MEDIA_ROOT}/detected/{name}{str(uuid.uuid4())}.jpg', userImage)
+                f'{settings.MEDIA_ROOT}/detected/{name}{id}.jpg', userImage)
             print(currentTime)
+            print(name)
             user = get_user_model()
             user = user.objects.filter(
                 profile_pic=f'profile_pic/{name}.jpg')
-            last_detected_images.objects.create(user=user[0], file=File(open(f'{settings.MEDIA_ROOT}/detected/{name}.jpg', 'rb')))
+            last_detected_images.objects.create(user=user, file=File(open(f'{settings.MEDIA_ROOT}/detected/{name}{id}.jpg', 'rb')))
             # if os.path.exists(f'{settings.MEDIA_ROOT}/detected/{name}.jpg'):
             #     os.remove(f'{settings.MEDIA_ROOT}/detected/{name}.jpg')
             print(name+'.jpg')
@@ -59,8 +60,13 @@ def findMatch(userImage,Encodings,classNames):
 
         
 def hi(userImage=None):
-    userImage = cv2.imread(settings.MEDIA_ROOT+'/' +
-        UserAccount.objects.values_list('profile_pic', flat=True)[0])
+
+    # userImage = cv2.imread(settings.MEDIA_ROOT+'/' +
+    #     UserAccount.objects.values_list('profile_pic', flat=True)[1])
+    # Load image as string from file/database
+    img = cv2.imdecode(np.fromstring(
+        userImage.read(), np.uint8), cv2.IMREAD_UNCHANGED)
+    userImage = img
     images = []
     classNames = []
     myList = UserAccount.objects.values_list('profile_pic', flat=True)

@@ -3,6 +3,10 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 import os 
 from phonenumber_field.modelfields import PhoneNumberField
 import datetime
+import sys
+from PIL import Image
+from io import BytesIO
+from django.core.files import File
 class UserAccountManager(BaseUserManager):
     def create_user(self, email,first_name,last_name, password=None):
         if not email:
@@ -88,6 +92,19 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name','last_name']
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.profile_pic = self.compressImage(self.profile_pic)
+        
+        super(UserAccount, self).save(*args, **kwargs)
+
+    def compressImage(self, image):
+        img = Image.open(image).convert("RGB")
+        im_io = BytesIO()
+        img.save(im_io, format='jpeg', optimize=True, quality=55)
+        new_image = File(im_io, name="%s.jpeg" % image.name.split('.')[0],)
+        return new_image
+    
     def get_full_name(self):
         return self.first_name + ' ' + self.last_name
     
