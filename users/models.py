@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToFill
+import os 
 from phonenumber_field.modelfields import PhoneNumberField
 class UserAccountManager(BaseUserManager):
     def create_user(self, email,first_name,last_name, password=None):
@@ -24,14 +23,23 @@ class UserAccountManager(BaseUserManager):
 
         return user
 
-class UserAccount(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(max_length=255, unique=True)
-    profile_pic = models.ImageField(upload_to='profile_pics', blank=True)
-    profile_thumbnail = ImageSpecField(source='profile_pic',
-                                      processors=[ResizeToFill(100, 50)],
-                                      format='JPEG',
-                                      options={'quality': 60})
 
+
+def wrapper(instance, filename):
+    ext = filename.split('.')[-1]
+            # get filename
+
+    filename = '{}{}'.format(instance.first_name, instance.last_name)
+    filename=f'{instance.first_name}-{instance.last_name}-{instance.roll_no}.{ext}'
+
+    return os.path.join('profile_pic', filename)
+    
+class UserAccount(AbstractBaseUser, PermissionsMixin):
+
+    email = models.EmailField(max_length=255, unique=True)
+    profile_pic = models.ImageField(
+        upload_to=wrapper, blank=True, height_field=None, width_field=None)
+    roll_no = models.CharField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     
@@ -75,4 +83,6 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
         return self.first_name
     
     def __str__(self):
-        return self.email
+        return self.first_name + ' ' + self.last_name
+
+
