@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 import os 
 from phonenumber_field.modelfields import PhoneNumberField
+import datetime
 class UserAccountManager(BaseUserManager):
     def create_user(self, email,first_name,last_name, password=None):
         if not email:
@@ -33,6 +34,16 @@ def wrapper(instance, filename):
     filename=f'{instance.first_name}-{instance.last_name}-{instance.roll_no}.{ext}'
 
     return os.path.join('profile_pic', filename)
+
+
+def last_matched_wrapper(instance, filename):
+    ext = filename.split('.')[-1]
+    # get filename
+
+    filename = '{}{}'.format(instance.first_name, instance.last_name)
+    filename = f'{instance.first_name}-{instance.last_name}-{instance.roll_no}-{datetime.time}.{ext}'
+
+    return os.path.join('last_matched_image', filename)
     
 class UserAccount(AbstractBaseUser, PermissionsMixin):
 
@@ -42,7 +53,8 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     roll_no = models.CharField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    
+    last_matched_image = models.ImageField(
+        upload_to=last_matched_wrapper, blank=True, height_field=None, width_field=None,null=True)
 
     address= models.TextField(max_length=555, blank=True,null=True)
     phone_number = PhoneNumberField()
