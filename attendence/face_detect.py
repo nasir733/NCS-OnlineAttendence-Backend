@@ -4,9 +4,14 @@ import face_recognition
 from users.models import UserAccount
 from django.conf import settings
 import os 
-path = 'ImagesAttendance'
-
-
+from PIL import Image
+import datetime
+from random import randint
+import uuid
+from django.core.files.base import ContentFile
+from django.core.files import File
+from django.contrib.auth import get_user_model
+from users.models import last_detected_images
 def findEncodings(images):
     encodeList = []
     for img in images:
@@ -27,7 +32,7 @@ def findMatch(userImage,Encodings,classNames):
         matchIndex = np.argmin(faceDis)
         if matches[matchIndex]:
 
-
+            currentTime = datetime.datetime.now()
             name = classNames[matchIndex]
 #print(name)
             y1, x2, y2, x1 = faceLoc
@@ -35,17 +40,27 @@ def findMatch(userImage,Encodings,classNames):
             cv2.rectangle(userImage, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.rectangle(userImage, (x1, y2-35), (x2, y2),
                           (0, 255, 0), cv2.FILLED)
-            cv2.putText(userImage, name, (x1+6, y2-6),
+            cv2.putText(userImage, name+' at '+currentTime.strftime("%H:%M"), (x1+6, y2-6),
                         cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
-            user = UserAccount.objects.filter(
-                profile_pic=name+'.jpg')
+            
+          
+            
+            cv2.imwrite(
+                f'{settings.MEDIA_ROOT}/detected/{name}{str(uuid.uuid4())}.jpg', userImage)
+            print(currentTime)
+            user = get_user_model()
+            user = user.objects.filter(
+                profile_pic=f'profile_pic/{name}.jpg')
+            last_detected_images.objects.create(user=user[0], file=File(open(f'{settings.MEDIA_ROOT}/detected/{name}.jpg', 'rb')))
+            # if os.path.exists(f'{settings.MEDIA_ROOT}/detected/{name}.jpg'):
+            #     os.remove(f'{settings.MEDIA_ROOT}/detected/{name}.jpg')
             print(name+'.jpg')
             print(user, 'found')
 
         
 def hi(userImage=None):
     userImage = cv2.imread(settings.MEDIA_ROOT+'/' +
-        UserAccount.objects.values_list('profile_pic', flat=True)[1])
+        UserAccount.objects.values_list('profile_pic', flat=True)[0])
     images = []
     classNames = []
     myList = UserAccount.objects.values_list('profile_pic', flat=True)
@@ -53,7 +68,7 @@ def hi(userImage=None):
         curImg = cv2.imread(settings.MEDIA_ROOT+'/'+cl)
         images.append(cv2.imread(settings.MEDIA_ROOT+'/'+cl))
         print()
-        classNames.append(os.path.splitext(cl)[0][12:-1])
+        classNames.append(os.path.splitext(cl)[0][12:])
     print(classNames)
     Encodings=findEncodings(images)
     findMatch(userImage, Encodings, classNames)

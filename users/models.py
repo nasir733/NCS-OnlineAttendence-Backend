@@ -98,3 +98,17 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
         return self.first_name + ' ' + self.last_name
 
 
+class last_detected_images (models.Model):
+
+    file = models.ImageField(null=True, blank=True)
+    user = models.ForeignKey(
+        "UserAccount", related_name="photos", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "last_detected_image"
+        verbose_name_plural = "last_detected_images"
+
+    def __str__(self):
+        return self.user.first_name + ' ' + self.user.last_name
+

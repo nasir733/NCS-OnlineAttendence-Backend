@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from django.contrib.auth.admin import UserAdmin
 from .models import UserAccount as Account
-
+from.models import last_detected_images 
 class AccountAdmin(UserAdmin):
 
   
@@ -15,4 +15,5 @@ class AccountAdmin(UserAdmin):
     )
 
 
-admin.site.register(Account, )
+admin.site.register(Account )
+admin.site.register(last_detected_images)
