@@ -7,6 +7,9 @@ import sys
 from PIL import Image
 from io import BytesIO
 from django.core.files import File
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFill
+
 class UserAccountManager(BaseUserManager):
     def create_user(self, email,first_name,last_name, password=None):
         if not email:
@@ -52,13 +55,17 @@ def last_matched_wrapper(instance, filename):
 class UserAccount(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(max_length=255, unique=True)
-    profile_pic = models.ImageField(
-        upload_to=wrapper, blank=True, height_field=None, width_field=None)
+    profile_pic = ProcessedImageField(
+        upload_to=wrapper, blank=True,
+        format='PNG',
+        options={'quality': 100})
     roll_no = models.CharField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    last_matched_image = models.ImageField(
-        upload_to=last_matched_wrapper, blank=True, height_field=None, width_field=None,null=True)
+    last_matched_image = ProcessedImageField(
+        upload_to=last_matched_wrapper, blank=True,
+        format='PNG',
+        options={'quality': 100},null=True)
 
     address= models.TextField(max_length=555, blank=True,null=True)
     phone_number = PhoneNumberField()

@@ -12,6 +12,7 @@ from django.core.files.base import ContentFile
 from django.core.files import File
 from django.contrib.auth import get_user_model
 from users.models import last_detected_images
+from icecream import ic
 def findEncodings(images):
     encodeList = []
     for img in images:
@@ -46,18 +47,20 @@ def findMatch(userImage,Encodings,classNames):
           
             id=str(uuid.uuid4())
             cv2.imwrite(
-                f'{settings.MEDIA_ROOT}/detected/{name}{id}.jpg', userImage)
+                f'{settings.MEDIA_ROOT}/detected/{name}{id}.png', userImage)
             print(currentTime)
             print(name)
             user = get_user_model()
             user = user.objects.filter(
-                profile_pic=f'profile_pic/{name}.jpg')
-            last_detected_images.objects.create(user=user, file=File(open(f'{settings.MEDIA_ROOT}/detected/{name}{id}.jpg', 'rb')))
+                profile_pic=f'profile_pic/{name}.png')
+            print(user)
+            detected = last_detected_images.objects.create(user=user[0], file=File(open(f'{settings.MEDIA_ROOT}/detected/{name}{id}.png', 'rb')))
+            detected.save()
             # if os.path.exists(f'{settings.MEDIA_ROOT}/detected/{name}.jpg'):
             #     os.remove(f'{settings.MEDIA_ROOT}/detected/{name}.jpg')
-            print(name+'.jpg')
+            print(name+'.png')
             print(user, 'found')
-
+            return detected
         
 def hi(userImage=None):
 
@@ -75,8 +78,7 @@ def hi(userImage=None):
         images.append(cv2.imread(settings.MEDIA_ROOT+'/'+cl))
         print()
         classNames.append(os.path.splitext(cl)[0][12:])
-    print(classNames)
     Encodings=findEncodings(images)
-    findMatch(userImage, Encodings, classNames)
+    return findMatch(userImage, Encodings, classNames)
     
 
