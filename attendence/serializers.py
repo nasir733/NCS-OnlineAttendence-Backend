@@ -15,9 +15,14 @@ user = get_user_model()
         
 
 class FaceDetectedSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True, many=False)
+    user = UserSerializer(read_only=True)
+    file = serializers.ImageField(
+        max_length=None, use_url=True
+    )
+
     class Meta:
         model = last_detected_images
         fields = ('id', 'file','user')
-        
+    def get_image_url(self, obj):
+        return obj.file.url
 

@@ -11,22 +11,24 @@ from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFill
 
 class UserAccountManager(BaseUserManager):
-    def create_user(self, email,first_name,last_name, password=None):
+    def create_user(self, email,first_name,last_name,profile_pic,roll_no,grade,phone_number=None,address=None, password=None):
         if not email:
             raise ValueError('Users must have an email address')
         
         email = self.normalize_email(email)
-        user = self.model(email=email, first_name=first_name ,last_name=last_name)
+        user = self.model(email=email, first_name=first_name ,last_name=last_name,profile_pic=profile_pic,roll_no=roll_no,grade=grade,phone_number=phone_number,address=address)
 
         user.set_password(password)
         user.save()
 
         return user
-    def create_superuser(self, email, first_name, last_name, password):
-        user = self.create_user(email, first_name, last_name, password)
+    def create_superuser(self, email, first_name, last_name, password,profile_pic,roll_no,grade,phone_number=None,address=None):
+        user = self.create_user(email=email, first_name=first_name, last_name=last_name, profile_pic=profile_pic,
+                                roll_no=roll_no, grade=grade, phone_number=phone_number, address=address,password=password)
 
         user.is_superuser = True
         user.is_staff = True
+        user.is_active = True
         user.save()
 
         return user
@@ -97,13 +99,9 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     objects = UserAccountManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name','last_name']
+    REQUIRED_FIELDS = ['first_name', 'last_name',
+                       'profile_pic', 'roll_no', 'grade', 'phone_number', 'address']
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.profile_pic = self.compressImage(self.profile_pic)
-        
-        super(UserAccount, self).save(*args, **kwargs)
 
     def compressImage(self, image):
         img = Image.open(image).convert("RGB")

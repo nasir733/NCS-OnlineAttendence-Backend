@@ -67,6 +67,7 @@ def hi(userImage=None):
     # userImage = cv2.imread(settings.MEDIA_ROOT+'/' +
     #     UserAccount.objects.values_list('profile_pic', flat=True)[1])
     # Load image as string from file/database
+    # print(userImage)
     img = cv2.imdecode(np.fromstring(
         userImage.read(), np.uint8), cv2.IMREAD_UNCHANGED)
     userImage = img

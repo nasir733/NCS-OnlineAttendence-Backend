@@ -17,7 +17,7 @@ class detect_face(APIView):
     parser_classes = (MultiPartParser, FormParser, FileUploadParser)
     def post(self,request,*args,**kwargs):
         picture = request.FILES.get('picture')
-        print(request.FILES.get('picture'))
+        print(request.data)
         detect = hi(userImage=picture)
         serializer = FaceDetectedSerializer(detect)
         print(serializer)

@@ -6,7 +6,8 @@ User = get_user_model()
 class UserCreateSerializer(UserCreateSerializer):
     class Meta(UserCreateSerializer.Meta):
         model = User
-        fields = ('id', 'username', 'email', 'roll_no','address','phone_no','grade','profile_pic')
+        fields = ('first_name', 'last_name',
+                  'profile_pic', 'roll_no', 'grade', 'phone_number', 'address')
         # exclude = ('profile_thumbnail' )
         
         
