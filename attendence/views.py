@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from .serializers import FaceDetectedSerializer
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from icecream import ic
+from users.models import UserAccount
 class detect_face(APIView):
     authentication_classes = []
     permission_classes = []
@@ -40,6 +41,9 @@ class attendence(APIView):
         attendece= Attendence.objects.get_or_create(year=year,month=month,day=day)
         print(user)
         print(attendece[0].presentStudents)
+        userObject = UserAccount.objects.get(id=user)
+        if userObject in attendece[0].presentStudents.all():
+            return Response({"message":"Already Present"})
         attendece[0].presentStudents.add(user)
         return Response(status=HTTP_200_OK)
         # except:
