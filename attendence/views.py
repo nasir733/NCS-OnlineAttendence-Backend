@@ -8,8 +8,8 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser, File
 from rest_framework.views import APIView
 from rest_framework import authentication, permissions 
 from rest_framework.response import Response
-from .serializers import FaceDetectedSerializer
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+from .serializers import FaceDetectedSerializer, AttendenceSerializer
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST,HTTP_208_ALREADY_REPORTED
 from icecream import ic
 from users.models import UserAccount
 class detect_face(APIView):
@@ -24,7 +24,14 @@ class detect_face(APIView):
         print(serializer)
         return Response(serializer.data, status=HTTP_200_OK)
        
-        
+
+class ViewAttendence(APIView):
+    authentication_classes = []
+    permission_classes = []
+    def get(self,request):
+        attendence = Attendence.objects.all()
+        serializer = AttendenceSerializer(attendence, many=True)
+        return Response(serializer.data,status=HTTP_200_OK)
 class attendence(APIView):
     authentication_classes = []
     permission_classes = []
@@ -43,7 +50,7 @@ class attendence(APIView):
         print(attendece[0].presentStudents)
         userObject = UserAccount.objects.get(id=user)
         if userObject in attendece[0].presentStudents.all():
-            return Response({"message":"Already Present"})
+            return Response({"message":"Already Present"},status=HTTP_208_ALREADY_REPORTED)
         attendece[0].presentStudents.add(user)
         return Response(status=HTTP_200_OK)
         # except:

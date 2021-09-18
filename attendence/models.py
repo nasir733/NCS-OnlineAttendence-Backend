@@ -10,3 +10,6 @@ class Attendence(models.Model):
     day= models.IntegerField()
     time = models.DateTimeField(auto_now_add=True)
     presentStudents = models.ManyToManyField(User,related_name='presentStudents',related_query_name='presentStudents')
+    
+    def __str__(self):
+        return f'{self.year}-{self.month}-{self.day}'
