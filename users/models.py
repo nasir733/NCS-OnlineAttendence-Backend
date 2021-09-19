@@ -9,7 +9,7 @@ from io import BytesIO
 from django.core.files import File
 from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFill
-
+from django.conf import settings
 class UserAccountManager(BaseUserManager):
     def create_user(self, email,first_name,last_name,profile_pic,roll_no,grade,phone_number=None,address=None, password=None):
         if not email:
@@ -50,7 +50,7 @@ def last_matched_wrapper(instance, filename):
     # get filename
 
     filename = '{}{}'.format(instance.first_name, instance.last_name)
-    filename = f'{instance.first_name}-{instance.last_name}-{instance.roll_no}-{datetime.time}.{ext}'
+    filename = f'{settings.MEDIA_ROOT}/{instance.first_name}-{instance.last_name}-{instance.roll_no}-{datetime.time}.{ext}'
 
     return os.path.join('last_matched_image', filename)
     
@@ -65,7 +65,8 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     last_matched_image = ProcessedImageField(
-        upload_to=last_matched_wrapper, blank=True,
+        upload_to='media/',
+        blank=True,
         format='PNG',
         options={'quality': 100},null=True)
 

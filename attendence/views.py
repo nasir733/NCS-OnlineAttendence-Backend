@@ -8,20 +8,21 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser, File
 from rest_framework.views import APIView
 from rest_framework import authentication, permissions 
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from .serializers import FaceDetectedSerializer, AttendenceSerializer
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST,HTTP_208_ALREADY_REPORTED
 from icecream import ic
 from users.models import UserAccount
+from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS,IsAdminUser
 class detect_face(APIView):
-    authentication_classes = []
-    permission_classes = []
+    permission_classes = [IsAdminUser]
     parser_classes = (MultiPartParser, FormParser, FileUploadParser)
     def post(self,request,*args,**kwargs):
         picture = request.FILES.get('picture')
         print(request.data)
         detect = hi(userImage=picture)
+        print(detect,"found")
         serializer = FaceDetectedSerializer(detect)
-        print(serializer)
         return Response(serializer.data, status=HTTP_200_OK)
        
 
@@ -33,8 +34,7 @@ class ViewAttendence(APIView):
         serializer = AttendenceSerializer(attendence, many=True)
         return Response(serializer.data,status=HTTP_200_OK)
 class attendence(APIView):
-    authentication_classes = []
-    permission_classes = []
+    permission_classes = [IsAdminUser]
     parser_classes = (MultiPartParser, FormParser, FileUploadParser)
     def post(self,request,*args,**kwargs):
         print(request.data)
@@ -53,5 +53,6 @@ class attendence(APIView):
             return Response({"message":"Already Present"},status=HTTP_208_ALREADY_REPORTED)
         attendece[0].presentStudents.add(user)
         return Response(status=HTTP_200_OK)
+        # except:
         # except:
         #     return Response(status=HTTP_400_BAD_REQUEST)

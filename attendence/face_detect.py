@@ -13,6 +13,7 @@ from django.core.files import File
 from django.contrib.auth import get_user_model
 from users.models import last_detected_images
 from icecream import ic
+from pprint import pprint
 def findEncodings(images):
     encodeList = []
     for img in images:
@@ -23,44 +24,33 @@ def findEncodings(images):
     return encodeList
 
 def findMatch(userImage,Encodings,classNames):
+    print('matching')
     imgS = cv2.resize(userImage, (0, 0), None, 0.25, 0.25)
     imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
-    facesCurrentFrame = face_recognition.face_locations(imgS)
+    # pprint(imgS)
+    facesCurrentFrame = face_recognition.face_locations(imgS,number_of_times_to_upsample=2)
+    # pprint(facesCurrentFrame)
     encodesCurrentFrame = face_recognition.face_encodings(imgS, facesCurrentFrame)
+    # pprint(encodesCurrentFrame)
     for encodeFace, faceLoc in zip(encodesCurrentFrame, facesCurrentFrame):
         matches = face_recognition.compare_faces(Encodings, encodeFace)
         faceDis = face_recognition.face_distance(Encodings, encodeFace)
         matchIndex = np.argmin(faceDis)
+        
         if matches[matchIndex]:
-
             currentTime = datetime.datetime.now()
             name = classNames[matchIndex]
-#print(name)
-            y1, x2, y2, x1 = faceLoc
-            y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
-            cv2.rectangle(userImage, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.rectangle(userImage, (x1, y2-35), (x2, y2),
-                          (0, 255, 0), cv2.FILLED)
-            cv2.putText(userImage, name+' at '+currentTime.strftime("%H:%M"), (x1+6, y2-6),
-                        cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
-            
-          
-            id=str(uuid.uuid4())
-            cv2.imwrite(
-                f'{settings.MEDIA_ROOT}/detected/{name}{id}.png', userImage)
-            print(currentTime)
-            print(name)
+            print(name,'this name is found')
             user = get_user_model()
             user = user.objects.filter(
                 profile_pic=f'profile_pic/{name}.png')
-            print(user)
-            detected = last_detected_images.objects.create(user=user[0], file=File(open(f'{settings.MEDIA_ROOT}/detected/{name}{id}.png', 'rb')))
-            detected.save()
-            # if os.path.exists(f'{settings.MEDIA_ROOT}/detected/{name}.jpg'):
-            #     os.remove(f'{settings.MEDIA_ROOT}/detected/{name}.jpg')
-            print(name+'.png')
-            print(user, 'found')
-            return detected
+            # print(user)
+ 
+            # print(name+'.png')
+            # print(user[0], 'found')
+            return user[0]
+        else:
+            print('no match found')
         
 def hi(userImage=None):
 
@@ -80,6 +70,12 @@ def hi(userImage=None):
         print()
         classNames.append(os.path.splitext(cl)[0][12:])
     Encodings=findEncodings(images)
-    return findMatch(userImage, Encodings, classNames)
+    print(classNames)
+    # print(Encodings)
+    # pprint(userImage)
+    results = findMatch(userImage, Encodings, classNames)
+    print(results,'results')
+    return results
+
     
 
