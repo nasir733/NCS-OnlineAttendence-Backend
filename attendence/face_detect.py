@@ -14,6 +14,9 @@ from django.contrib.auth import get_user_model
 from users.models import last_detected_images
 from icecream import ic
 from pprint import pprint
+from django.core.files.storage import default_storage
+from attendence.models import FaceEncoding
+
 def findEncodings(images):
     encodeList = []
     for img in images:
@@ -27,27 +30,22 @@ def findMatch(userImage,Encodings,classNames):
     print('matching')
     imgS = cv2.resize(userImage, (0, 0), None, 0.25, 0.25)
     imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
-    # pprint(imgS)
     facesCurrentFrame = face_recognition.face_locations(imgS,number_of_times_to_upsample=2)
-    # pprint(facesCurrentFrame)
     encodesCurrentFrame = face_recognition.face_encodings(imgS, facesCurrentFrame)
-    # pprint(encodesCurrentFrame)
     for encodeFace, faceLoc in zip(encodesCurrentFrame, facesCurrentFrame):
         matches = face_recognition.compare_faces(Encodings, encodeFace)
         faceDis = face_recognition.face_distance(Encodings, encodeFace)
-        matchIndex = np.argmin(faceDis)
-        
+        print(faceDis,'this is the fase distance')
+        matchIndex = faceDis.argmin(axis=0)
+        print(matchIndex,'this is the match index ---')
+        print(type(matches[matchIndex]),'this is the matches')
         if matches[matchIndex]:
             currentTime = datetime.datetime.now()
             name = classNames[matchIndex]
-            print(name,'this name is found')
             user = get_user_model()
             user = user.objects.filter(
                 profile_pic=f'profile_pic/{name}.png')
-            # print(user)
  
-            # print(name+'.png')
-            # print(user[0], 'found')
             return user[0]
         else:
             print('no match found')
@@ -61,21 +59,34 @@ def hi(userImage=None):
     img = cv2.imdecode(np.fromstring(
         userImage.read(), np.uint8), cv2.IMREAD_UNCHANGED)
     userImage = img
-    images = []
-    classNames = []
-    myList = UserAccount.objects.values_list('profile_pic', flat=True)
-    for  cl in myList:
-        curImg = cv2.imread(settings.MEDIA_ROOT+'/'+cl)
-        images.append(cv2.imread(settings.MEDIA_ROOT+'/'+cl))
-        print()
-        classNames.append(os.path.splitext(cl)[0][12:])
-    Encodings=findEncodings(images)
-    print(classNames)
+    # images = []
+    # classNames = []
+    # myList = UserAccount.objects.values_list('profile_pic', flat=True)
+    # for  cl in myList:
+    #     file = default_storage.open(cl)
+    #     readFile = file.read()
+    #     file.close()
+    #     nparr = np.fromstring(readFile, np.uint8)
+    #     img_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    #     print(len(img_np),'the image is read ---------------')
+    #     # curImg = cv2.imread(readFile)
+    #     # print(curImg, 'the image is read----------')
+    #     images.append(img_np)
+    #     classNames.append(os.path.splitext(cl)[0][12:])
+    # Encodings=findEncodings(images)
+    # print(classNames)
     # print(Encodings)
     # pprint(userImage)
-    results = findMatch(userImage, Encodings, classNames)
+    FaceEncodes = FaceEncoding.objects.all().first()
+    Encodings = FaceEncodes.encodings
+    # Encodings = np.array(np.array(Encodings))
+    # Encodings = [Encodings]
+    # print(Encodings, 'from the face detecht-------------------------->>>>> ')
+    newEncodings = []
+    for i in range(len(Encodings)):
+        newEncodings.append(np.array(Encodings[i]))
+    print(newEncodings, 'from the face detecht-------------------------->>>>> ')
+    classNames = FaceEncodes.classNames
+    results = findMatch(userImage, newEncodings, classNames)
     print(results,'results')
     return results
-
-    
-

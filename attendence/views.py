@@ -15,15 +15,18 @@ from icecream import ic
 from users.models import UserAccount
 from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS,IsAdminUser
 class detect_face(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = []
+    authentication_classes = []
     parser_classes = (MultiPartParser, FormParser, FileUploadParser)
     def post(self,request,*args,**kwargs):
         picture = request.FILES.get('picture')
         print(request.data)
         detect = hi(userImage=picture)
         print(detect,"found")
-        serializer = FaceDetectedSerializer(detect)
-        return Response(serializer.data, status=HTTP_200_OK)
+        if detect:
+            serializer = FaceDetectedSerializer(detect)
+            return Response(serializer.data, status=HTTP_200_OK)
+        return Response({"message":"No face found"}, status=HTTP_400_BAD_REQUEST)
        
 
 class ViewAttendence(APIView):
