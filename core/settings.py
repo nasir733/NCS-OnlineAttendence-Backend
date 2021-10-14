@@ -36,7 +36,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 BROKER_POOL_LIMIT = 3
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER")
 CELERY_RESULT_BACKEND = os.environ.get(
-    "REDIS_URL") or os.environ.get("CELERY_RESULT_BACKEND")
+    "REDIS_URL")
 # print(CELERY_BROKER_URL)
 INTERNAL_IPS = [
     "127.0.0.1",
