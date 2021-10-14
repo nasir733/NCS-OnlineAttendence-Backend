@@ -1,4 +1,1 @@
-libsm6
-libxrender1
-libfontconfig1
-libice6
+libsm6 libxrender1 libfontconfig1 libice6 ffmpeg libsm6 libxext6 libglu1 python3-opencv libgl1-mesa-glx opencv-python
