@@ -30,11 +30,13 @@ SECRET_KEY = 'django-insecure-zns_-musom#6*0ve%2*4ap)n$d$w&=1vwd_1qw5r+6z!d3@w=f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 BROKER_POOL_LIMIT = 3
-CELERY_BROKER_URL=os.environ.get("REDIS_URL")
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER")
+CELERY_RESULT_BACKEND = os.environ.get(
+    "REDIS_URL") or os.environ.get("CELERY_RESULT_BACKEND")
 # print(CELERY_BROKER_URL)
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -56,12 +58,12 @@ INSTALLED_APPS = [
     'drf_spectacular',
     # 'social_django',
     'rest_framework_simplejwt',
-'attendence',
-'users',
-'corsheaders',
-"imagekit",
-'phonenumber_field',
-"django_celery_beat",
+    'attendence',
+    'users',
+    'corsheaders',
+    "imagekit",
+    'phonenumber_field',
+    "django_celery_beat",
 
 ]
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -72,10 +74,10 @@ EMAIL_HOST_USER = "engnasir733@gmail.com"
 EMAIL_HOST_PASSWORD = "sofsbiqetumoxvqv"
 EMAIL_USE_TLS = True
 MIDDLEWARE = [
-     'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -108,7 +110,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-'default': {
+    'default': {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
@@ -124,7 +126,8 @@ DATABASES = {
 
     }
 }
-# DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+DATABASES['default'] = dj_database_url.config(
+    conn_max_age=600, ssl_require=True)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -186,7 +189,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_AUTHENTICATION_CLASSES": (
-      'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         "rest_framework.authentication.SessionAuthentication",
     ),
 }
@@ -199,7 +202,7 @@ SPECTACULAR_SETTINGS = {
 }
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(weeks=22),
-   'AUTH_HEADER_TYPES': ('JWT',),
+    'AUTH_HEADER_TYPES': ('JWT',),
 }
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = "JWT"
@@ -230,10 +233,10 @@ AUTHENTICATION_BACKENDS = (
 )
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-AWS_ACCESS_KEY_ID =os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY =os.environ.get('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME =os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-AWS_QUERYSTRING_AUTH =False
+AWS_QUERYSTRING_AUTH = False
 django_heroku.settings(locals())
