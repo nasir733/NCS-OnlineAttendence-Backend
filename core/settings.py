@@ -36,7 +36,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 BROKER_POOL_LIMIT = 3
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER")
 CELERY_RESULT_BACKEND = os.environ.get(
-    "REDIS_URL")
+    "CELERY_BROKER")
 # print(CELERY_BROKER_URL)
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -114,20 +114,20 @@ DATABASES = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-        'NAME': 'attendence',
+        'NAME': 'postgres',
 
         'USER': 'postgres',
 
-        'PASSWORD': '2424',
+        'PASSWORD': os.environ.get("AWS_PASSWORD"),
 
-        'HOST': 'localhost',
+        'HOST': os.environ.get("HOST"),
 
         'PORT': '5432',
 
     }
 }
-DATABASES['default'] = dj_database_url.config(
-    conn_max_age=600, ssl_require=True)
+# DATABASES['default'] = dj_database_url.config(
+#     conn_max_age=600, ssl_require=True)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
