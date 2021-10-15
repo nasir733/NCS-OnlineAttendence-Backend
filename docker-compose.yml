@@ -9,7 +9,7 @@ services:
       - .:/usr/src/app/
       - static_volume:/usr/src/app/staticfiles
       - media_volume:/usr/src/app/mediafiles
-    expose:
+    ports:
       - "8000:8000"
 
     env_file:
