@@ -1,7 +1,8 @@
 FROM python:3.9.7-bullseye
 ENV PYTHONUNBUFFERED=1
 COPY requirements.txt /usr/src/app/
-
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 RUN set -ex \
     && pip install --upgrade pip \
     && pip install Cmake \

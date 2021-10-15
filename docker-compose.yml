@@ -7,15 +7,24 @@ services:
     command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/usr/src/app/
-    ports:
-      - "8000:8000"
-      - "5432:5432"
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/mediafiles
+    expose:
+      - 8000
+
+    env_file:
+      - ./.env
 
     environment:
       - DEBUG=1
       - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
       - CELERY_BROKER=redis://redis:6379/0
       - CELERY_BACKEND=redis://redis:6379/0
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME}
+      - HOST=${HOST}
+      - AWS_PASSWORD=${AWS_PASSWORD}
     depends_on:
       - redis
       - celery
@@ -33,3 +42,14 @@ services:
       - redis
   redis:
     image: "redis:alpine"
+
+  nginx:
+    build: ./nginx
+    ports:
+      - 1337:80
+    depends_on:
+      - django
+
+volumes:
+  static_volume:
+  media_volume:
