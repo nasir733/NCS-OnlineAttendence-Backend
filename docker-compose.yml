@@ -4,7 +4,7 @@ services:
   django:
     build: .
     container_name: django
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers=5
     volumes:
       - .:/usr/src/app/
       - static_volume:/usr/src/app/staticfiles
