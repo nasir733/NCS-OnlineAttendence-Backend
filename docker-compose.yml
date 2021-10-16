@@ -25,7 +25,8 @@ services:
       - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME}
       - HOST=${HOST}
       - AWS_PASSWORD=${AWS_PASSWORD}
-    depends_on:
+    depends_on: 
+      - db
       - redis
       - celery
   celery:
@@ -42,7 +43,14 @@ services:
       - redis
   redis:
     image: "redis:alpine"
-
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
   nginx:
     build: ./nginx
     ports:

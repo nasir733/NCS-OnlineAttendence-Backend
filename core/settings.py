@@ -118,11 +118,11 @@ DATABASES = {
 
         'USER': 'postgres',
 
-        'PASSWORD': os.environ.get("AWS_PASSWORD"),
+        'PASSWORD': 'postgres',
 
-        'HOST': os.environ.get("HOST"),
+        'HOST': 'db',
 
-        'PORT': '5432',
+        'PORT': 5432,
 
     }
 }

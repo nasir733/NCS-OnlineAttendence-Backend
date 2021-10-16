@@ -33,6 +33,7 @@ django-imagekit==4.0.2
 django-ndarray==0.0.3
 django-ndarrayfield==1.0.0rc4
 django-phonenumber-field==5.2.0
+psycopg2-binary 
 django-restframework==0.0.1
 django-storages==1.11.1
 django-templated-mail==1.1.1
