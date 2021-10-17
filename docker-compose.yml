@@ -53,12 +53,12 @@ services:
   #     - POSTGRES_PASSWORD=postgres
   #   depends_on:
   #     - django
-  nginx:
-    build: ./nginx
-    ports:
-      - 80:80
-    depends_on:
-      - django
+  # nginx:
+  #   build: ./nginx
+  #   ports:
+  #     - 80:80
+  #   depends_on:
+  #     - django
 
 volumes:
   static_volume:
