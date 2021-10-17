@@ -43,16 +43,16 @@ services:
       - redis
   redis:
     image: "redis:alpine"
-  db:
-    image: postgres
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    depends_on:
-      - django
+  # db:
+  #   image: postgres
+  #   volumes:
+  #     - ./data/db:/var/lib/postgresql/data
+  #   environment:
+  #     - POSTGRES_DB=postgres
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #   depends_on:
+  #     - django
   nginx:
     build: ./nginx
     ports:
