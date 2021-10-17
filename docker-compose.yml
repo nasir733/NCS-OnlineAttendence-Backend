@@ -25,8 +25,7 @@ services:
       - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME}
       - HOST=${HOST}
       - AWS_PASSWORD=${AWS_PASSWORD}
-    depends_on: 
-      - db
+    depends_on:
       - redis
       - celery
   celery:
@@ -51,6 +50,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
+    depends_on:
+      - django
   nginx:
     build: ./nginx
     ports:
