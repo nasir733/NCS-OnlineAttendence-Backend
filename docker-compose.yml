@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+  restart: always
   django:
     build: .
     container_name: django
@@ -29,6 +30,7 @@ services:
     depends_on:
       - redis
       - celery
+      - db
   celery:
     build: .
     command: celery -A core worker -l INFO
@@ -43,17 +45,16 @@ services:
       - redis
   redis:
     image: "redis:alpine"
-  # db:
-  #   image: postgres
-  #   volumes:
-  #     - ./data/db:/var/lib/postgresql/data
-  #   environment:
-  #     - POSTGRES_DB=postgres
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=postgres
-  #   depends_on:
-  #     - django
-  # nginx:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
+  #  # nginx:
   #   build: ./nginx
   #   ports:
   #     - 80:80

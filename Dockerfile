@@ -7,8 +7,9 @@ RUN set -ex \
     && pip install --upgrade pip \
     && pip install Cmake \
     && pip install gunicorn\
-    && pip install --no-cache-dir -r /usr/src/app/requirements.txt
-RUN apt-get update && apt-get install -y python3-opencv
+    && pip install --no-cache-dir -r /usr/src/app/requirements.txt\
+    && apt-get install libpq-dev
+    RUN apt-get update && apt-get install -y python3-opencv
 # RUN python /app/manage.py migrate 
 
 
